@@ -91,4 +91,4 @@ python your_filename.py
 ## 👨‍💻 Author
 
 **Alok Kumar**  
-[LinkedIn](https://www.linkedin.com/) | [GitHub](https://github.com/your-username)
+[LinkedIn](https://www.linkedin.com/in/alok-kumar-481045238/) | [GitHub](https://github.com/2784alok\)
