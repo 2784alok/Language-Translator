@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>AI Travel Translator</title>
+  <title>Language Translator</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
   <style>
@@ -30,7 +30,7 @@
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-[url('image.png')]">
   <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl">
-    <h1 class="text-3xl font-bold text-center mb-6">🌍 AI Travel Translator</h1>
+    <h1 class="text-3xl font-bold text-center mb-6">Language Translator</h1>
 
     <div class="flex flex-col md:flex-row gap-4 mb-4">
       <div class="flex-1">
@@ -97,7 +97,7 @@
 
     function toggleVoiceInput() {
       if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-        alert("❌ Your browser does not support Speech Recognition.");
+        alert("Your browser does not support Speech Recognition.");
         return;
       }
 
@@ -110,24 +110,24 @@
 
         recognition.onstart = () => {
           isListening = true;
-          document.getElementById('voiceBtn').textContent = "🛑 Stop Listening";
+          document.getElementById('voiceBtn').textContent = " Stop Listening";
           document.getElementById('status').textContent = "🎙️ Listening...";
         };
 
         recognition.onresult = (event) => {
           const speechResult = event.results[0][0].transcript;
           document.getElementById('inputText').value = speechResult;
-          document.getElementById('status').textContent = "✅ Voice input received.";
+          document.getElementById('status').textContent = " Voice input received.";
         };
 
         recognition.onerror = (event) => {
-          document.getElementById('status').textContent = "❌ Error: " + event.error;
+          document.getElementById('status').textContent = " Error: " + event.error;
         };
 
         recognition.onend = () => {
           isListening = false;
-          document.getElementById('voiceBtn').textContent = "🎤 Start Listening";
-          document.getElementById('status').textContent = "🛑 Listening stopped.";
+          document.getElementById('voiceBtn').textContent = " Start Listening";
+          document.getElementById('status').textContent = " Listening stopped.";
         };
 
         recognition.start();
