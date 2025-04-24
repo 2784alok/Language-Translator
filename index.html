@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AI Travel Translator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Nunito', sans-serif;
+    }
+    .btn {
+      background-color: #136fca;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: background-color 0.3s, transform 0.3s;
+      white-space: nowrap;
+    }
+    .btn:hover {
+      background-color: #45a049;
+      transform: scale(1.05);
+    }
+    .btn:active {
+      background-color: #3e8e41;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 bg-cover bg-center bg-[url('image.png')]">
+  <div class="bg-white shadow-lg rounded-lg p-6 w-full max-w-3xl">
+    <h1 class="text-3xl font-bold text-center mb-6">🌍 AI Travel Translator</h1>
+
+    <div class="flex flex-col md:flex-row gap-4 mb-4">
+      <div class="flex-1">
+        <label for="fromLang" class="block text-sm font-medium text-gray-700">From Language:</label>
+        <select id="fromLang" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <option value="en">English</option>
+          <option value="hi">Hindi</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="zh-CN">Chinese</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <option value="ru">Russian</option>
+        </select>
+      </div>
+      <div class="flex-1">
+        <label for="toLang" class="block text-sm font-medium text-gray-700">To Language:</label>
+        <select id="toLang" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+          <option value="hi">Hindi</option>
+          <option value="en">English</option>
+          <option value="es">Spanish</option>
+          <option value="fr">French</option>
+          <option value="de">German</option>
+          <option value="zh-CN">Chinese</option>
+          <option value="ja">Japanese</option>
+          <option value="ko">Korean</option>
+          <option value="ru">Russian</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="mb-4">
+      <label for="inputText" class="block text-sm font-medium text-gray-700">Input Text:</label>
+      <textarea id="inputText" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Type or speak something..."></textarea>
+    </div>
+
+    <div class="mb-4">
+      <label for="outputText" class="block text-sm font-medium text-gray-700">Translated Text:</label>
+      <textarea id="outputText" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" placeholder="Translation will appear here..." readonly></textarea>
+    </div>
+
+    <div class="flex flex-wrap justify-center gap-3 sm:gap-4 mb-4">
+      <button id="voiceBtn" onclick="toggleVoiceInput()" class="btn flex items-center gap-2 w-full sm:w-auto justify-center">
+        <i class="fas fa-microphone"></i> <span class="hidden sm:inline">Start Listening</span>
+      </button>
+      <button onclick="translateText()" class="btn flex items-center gap-2 w-full sm:w-auto justify-center">
+        <i class="fas fa-globe"></i> <span class="hidden sm:inline">Translate</span>
+      </button>
+      <button onclick="speakText()" class="btn flex items-center gap-2 w-full sm:w-auto justify-center">
+        <i class="fas fa-volume-up"></i> <span class="hidden sm:inline">Speak Output</span>
+      </button>
+      <button onclick="swapLanguages()" class="btn flex items-center gap-2 w-full sm:w-auto justify-center">
+        <i class="fas fa-sync-alt"></i> <span class="hidden sm:inline">Swap Languages</span>
+      </button>
+    </div>
+
+    <div id="status" class="text-center text-sm text-gray-600"></div>
+  </div>
+
+  <script>
+    let recognition;
+    let isListening = false;
+
+    function toggleVoiceInput() {
+      if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+        alert("❌ Your browser does not support Speech Recognition.");
+        return;
+      }
+
+      if (!isListening) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        recognition = new SpeechRecognition();
+        recognition.lang = document.getElementById('fromLang').value;
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        recognition.onstart = () => {
+          isListening = true;
+          document.getElementById('voiceBtn').textContent = "🛑 Stop Listening";
+          document.getElementById('status').textContent = "🎙️ Listening...";
+        };
+
+        recognition.onresult = (event) => {
+          const speechResult = event.results[0][0].transcript;
+          document.getElementById('inputText').value = speechResult;
+          document.getElementById('status').textContent = "✅ Voice input received.";
+        };
+
+        recognition.onerror = (event) => {
+          document.getElementById('status').textContent = "❌ Error: " + event.error;
+        };
+
+        recognition.onend = () => {
+          isListening = false;
+          document.getElementById('voiceBtn').textContent = "🎤 Start Listening";
+          document.getElementById('status').textContent = "🛑 Listening stopped.";
+        };
+
+        recognition.start();
+      } else {
+        recognition.stop();
+      }
+    }
+
+    async function translateText() {
+      const inputText = document.getElementById('inputText').value;
+      const fromLang = document.getElementById('fromLang').value;
+      const toLang = document.getElementById('toLang').value;
+
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(inputText)}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      const translated = data[0][0][0];
+      document.getElementById('outputText').value = translated;
+    }
+
+    function speakText() {
+      const synth = window.speechSynthesis; //web speech api text to speech
+      const text = document.getElementById('outputText').value;
+      const toLang = document.getElementById('toLang').value;
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = synth.getVoices();
+
+      const preferredVoice = voices.find(v =>
+        v.lang.startsWith(toLang) && v.name.toLowerCase().includes("female")
+      ) || voices.find(v =>
+        v.lang.startsWith(toLang)
+      ) || voices.find(v =>
+        v.lang.startsWith("en")
+      );
+
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
+      }
+
+      utterance.pitch = 1.5;
+      utterance.rate = 0.9; // Slower rate for easier listening
+      synth.cancel();
+      synth.speak(utterance);
+    }
+
+    function swapLanguages() {
+      const fromLang = document.getElementById('fromLang');
+      const toLang = document.getElementById('toLang');
+      [fromLang.value, toLang.value] = [toLang.value, fromLang.value];
+    }
+
+    window.speechSynthesis.onvoiceschanged = () => {}; // trigger voice loading
+  </script>
+</body>
+</html>
